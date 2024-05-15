@@ -19,8 +19,14 @@ fn main() -> Result<()> {
 
     let pkgconfig_ooio = pkg_config::probe_library("OpenImageIO")?;
     let pkgconfig_imath = pkg_config::probe_library("Imath")?;
-    
-    let include_paths = [pkgconfig_ooio.include_paths, pkgconfig_imath.include_paths].concat();
+    let pkgconfig_gdal = pkg_config::probe_library("gdal")?;
+
+    let include_paths = [
+        pkgconfig_ooio.include_paths,
+        pkgconfig_imath.include_paths,
+        pkgconfig_gdal.include_paths,
+    ]
+    .concat();
 
     cxx_build::bridges(NAMES.iter().map(|s| format!("src/{}.rs", s)))
         .files(NAMES.iter().map(|s| format!("src/ffi_{}.cpp", s)))
