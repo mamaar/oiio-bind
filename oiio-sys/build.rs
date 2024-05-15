@@ -17,12 +17,15 @@ fn main() -> Result<()> {
         return Ok(());
     }
 
-    let pkgconfig = pkg_config::probe_library("OpenImageIO")?;
+    let pkgconfig_ooio = pkg_config::probe_library("OpenImageIO")?;
+    let pkgconfig_imath = pkg_config::probe_library("Imath")?;
+    
+    let include_paths = [pkgconfig_ooio.include_paths, pkgconfig_imath.include_paths].concat();
 
     cxx_build::bridges(NAMES.iter().map(|s| format!("src/{}.rs", s)))
         .files(NAMES.iter().map(|s| format!("src/ffi_{}.cpp", s)))
         .flag_if_supported("-std=c++17")
-        .includes(&pkgconfig.include_paths)
+        .includes(&include_paths)
         .compile("oiio-sys");
 
     println!("cargo:rerun-if-changed=src/lib.rs");
